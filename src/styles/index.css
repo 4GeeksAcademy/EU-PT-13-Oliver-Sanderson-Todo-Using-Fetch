@@ -11,6 +11,10 @@
 
 */
 
+/* * {
+    border: red dashed 2px;
+} */
+
 body {
     background-color: #212529;
 }
@@ -29,6 +33,14 @@ input {
     width: 100%;
     background-color: #212529;
     color: white;
+    border: 1px white solid;
+    padding: 5px;
+}
+
+.inputInside {
+    width: 100%;
+    background-color: #212529;
+    color: white;
     border: none;
     padding: 5px;
 }
@@ -39,4 +51,8 @@ input {
 
 .hoverButton {
     visibility: hidden;
+}
+
+.usernameNameplate {
+    width: 200px;
 }

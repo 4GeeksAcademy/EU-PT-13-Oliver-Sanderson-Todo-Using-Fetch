@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 
-function ToDo() {
+function ToDo(props) {
 
-    const [toDoArr, setToDoArr] = useState (["Do work"])
+    const [toDoArr, setToDoArr] = useState (props.tasks)
     const [input, setInput] = useState("")
+
+    console.log(toDoArr)
 
     function addItem () {
         let result = input.trim()
@@ -29,7 +31,7 @@ function ToDo() {
             <h1 className="text-center">To Do List</h1>
             <ul>
                 <li className="d-flex">
-                     <input 
+                     <input className="inputInside"
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={e => {
                             if (e.key === "Enter") {

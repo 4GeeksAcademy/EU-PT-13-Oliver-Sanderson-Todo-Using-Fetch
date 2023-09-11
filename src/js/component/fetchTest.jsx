@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
+import ToDo from "./ToDo";
 
 function FetchTest () {
 
     const [fetchedData, setFetchedData] = useState(["loading..."])
+    const [loggedIn, setLoggedIn] = useState(false)
+    const [showToDo, setshowToDo] = useState(false)
+    const [taskList, setTaskList] = useState([])
+    let usernameSet = " "
 
     useEffect(() => 
     {
         fetch("https://playground.4geeks.com/apis/fake/todos/user/oliver")
         .then((returned) => {
-            console.log(returned);
             if(!returned.ok) {setFetchedData("Something went wrong!")}
             return returned.json()
         })
         .then((dataToWork) => {
-            console.log(dataToWork[0].label);
             setFetchedData(dataToWork.map((item, index) => <div key={index}>{item.label}</div>));
             return dataToWork
             } )
@@ -25,8 +28,7 @@ function FetchTest () {
     )
 
     function staticSetTest() {
-        console.log("Button clicked!")
-        fetch ("https://playground.4geeks.com/apis/fake/todos/user/oliver", {
+        fetch ("https://playground.4geeks.com/apis/fake/todos/user/oliver" , {
             method: "PUT",
             body: JSON.stringify(
                 [
@@ -55,10 +57,52 @@ function FetchTest () {
         });
     }
 
+    function checkUser () {
+
+        if(loggedIn) {
+            setLoggedIn(false)
+            setTaskList([])
+            setshowToDo(false)
+        } else {
+
+            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + usernameSet)
+            .then(
+                jsonData => jsonData.json()
+            ).then(
+                data => {
+                    if(data.msg) {
+                        document.getElementById("validUserText").innerHTML = data.msg
+                        setLoggedIn(false)
+                        setshowToDo(false)
+                    } else {
+                        document.getElementById("validUserText").innerHTML = "Logged in as " + usernameSet
+                        setLoggedIn(true)
+                        for (let i = 0; i < data.length; i++) {
+                            setTaskList((pre) => {pre.push(data[i].label); return pre})
+                            console.log(taskList)
+                        }
+
+                    }
+                
+                }
+            ).then(() => {console.log(taskList); setshowToDo(true)})
+        }
+    }
+
+
     return (
         <div>
-        <div>{fetchedData}</div>
-        <button onClick={staticSetTest}>Update tasks</button>
+            logged in = {loggedIn ? "TRUE" : "FALSE"}
+            <div className="d-flex">
+                <label for="username" className="usernameNameplate">Enter Username: </label>
+                <input id="username" className={loggedIn ? "bg-secondary" : ""} onChange={ e => usernameSet = e.target.value } disabled={loggedIn ? true : false}></input>
+                
+            </div>
+            <p id="validUserText" className="">Not logged in</p>
+            <button className={`btn btn-${loggedIn ? "danger" : "success"}`} onClick={checkUser}>{loggedIn ? "Logout" : "Login"}</button>
+            <div>{fetchedData}</div>
+            <button onClick={staticSetTest}>Update tasks</button>
+            {showToDo ? <ToDo tasks={taskList} /> : ""}
         </div>
     )
 }

@@ -6,6 +6,7 @@ function ToDo(props) {
     const [input, setInput] = useState("")
 
     console.log(toDoArr)
+    console.log(props.user)
 
     function addItem () {
         let result = input.trim()

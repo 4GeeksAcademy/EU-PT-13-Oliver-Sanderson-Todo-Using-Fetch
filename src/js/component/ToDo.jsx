@@ -1,30 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function ToDo(props) {
 
-    const [toDoArr, setToDoArr] = useState (props.tasks)
-    const [input, setInput] = useState("")
+    
 
-    console.log(toDoArr)
-    console.log(props.user)
+
+
+    const [toDoArr, setToDoArr] = useState(props.tasks)
+    const [input, setInput] = useState("")
+    const [taskList, setTaskList] = useState(["Loading"])
+
+    useEffect(() => {
+
+            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => { 
+                setTaskList(data.map((item) => item.label));
+            })
+
+        }, [])
+
+
+
+    function returnUpdatedTodo () {
+        let array = props.tasks.map((item) => {return{"label": item, "done": false}})
+        array.unshift({ "label": input, "done": false },)
+        return array
+    }
+
+    function returnDeletedTodo (idToDelete) {
+        let array = props.tasks.filter((item,index) => index != idToDelete)
+        array = array.map((item) => {return{"label": item, "done": false}})
+        return array
+    }
 
     function addItem () {
-        let result = input.trim()
-        if (!result) {
-            alert("You need to enter valid text!")
-        } else {
-            setToDoArr(toDoArr.concat([result]))
-            setInput("")
-        }
+
+        fetch ("https://playground.4geeks.com/apis/fake/todos/user/" + props.user , {
+            method: "PUT",
+            body: JSON.stringify(
+                returnUpdatedTodo()
+            ),
+
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(resp => {
+            console.log(resp);
+        })
 
     }
 
-    const listItems = toDoArr.map((item, index) => 
-        <li className="d-flex justify-content-between hoverParent">
+    function deleteItem (e) {
+        console.log(e.target.parentElement.id);
+        console.log(props.tasks.filter((item, index) => 
+            index != e.target.parentElement.id
+            ))
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user ,{
+            method: "PUT",
+            body: JSON.stringify(
+                returnDeletedTodo(e.target.parentElement.id)
+            ),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(resp => {
+            console.log(resp);
+        })
+    }
+
+    const listItems = props.tasks.map((item, index) => 
+        <li key={index} id={index} className="d-flex justify-content-between hoverParent">
         <p className="m-2" >{item}</p>
         <button className="btn btn-danger hoverButton" 
-        onClick={ () => setToDoArr(toDoArr.filter((x, i) => {return index != i}))}
-        ><i class="fa-solid fa-x"></i></button>
+        onClick={ deleteItem }
+        ><i className="fa-solid fa-x"></i></button>
         </li>
         )
     return (
@@ -42,11 +94,9 @@ function ToDo(props) {
                             value={input} placeholder="What needs to be done?"/>
                             <button className="btn btn-primary" onClick={addItem}>Submit</button>
                 </li>
-                {listItems.length === 0 ? <li><p className="m-2" >No tasks, add a task.</p></li> : ""}
-                {listItems}
+                {listItems.length === 0 ? <li><p className="m-2" >No tasks, add a task.</p></li> : listItems}
             </ul>
-            <p>{listItems.length} item{listItems.length != 1 ? "s" : ""} left</p>
-            
+            {taskList}
         </div>
     )
 }

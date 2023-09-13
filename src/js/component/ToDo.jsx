@@ -5,7 +5,6 @@ function ToDo(props) {
     const [toDoArr, setToDoArr] = useState(props.tasks)
     const [input, setInput] = useState("")
 
-
     useEffect(() => {
         primaryFetch()
     }, [])

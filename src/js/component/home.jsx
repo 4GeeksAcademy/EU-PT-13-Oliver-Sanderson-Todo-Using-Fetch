@@ -2,14 +2,14 @@ import React from "react";
 
 //include images into your bundle
 import rigoImage from "../../img/rigo-baby.jpg";
-import FetchTest from "./fetchTest";
+import Login from "./Login";
 
 
 //create your first component
 const Home = () => {
 	return (
 		<div className="bg-dark text-light">
-			<FetchTest />
+			<Login />
 
 		</div>
 	);

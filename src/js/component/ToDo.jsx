@@ -12,7 +12,7 @@ function ToDo(props) {
 
     function primaryFetch () {
         console.log("primary fetch ran")
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user)
+        fetch(props.url + props.user)
         .then(response => {
             return response.json();
         })
@@ -37,7 +37,7 @@ function ToDo(props) {
         if(input.trim() === "") {
             alert("Input cannot be empty")
         } else {
-            fetch ("https://playground.4geeks.com/apis/fake/todos/user/" + props.user , {
+            fetch (props.url + props.user , {
                 method: "PUT",
                 body: JSON.stringify(
                     returnUpdatedTodo()
@@ -61,7 +61,7 @@ function ToDo(props) {
         if (toDoArr.length === 1) {
             alert("Cannot delete the last task!")
         } else {
-            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user ,{
+            fetch(props.url + props.user ,{
                 method: "PUT",
                 body: JSON.stringify(
                     returnDeletedTodo(e.target.parentElement.id)

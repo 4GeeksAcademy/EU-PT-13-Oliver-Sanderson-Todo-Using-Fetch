@@ -4,14 +4,15 @@ import ToDo from "./ToDo";
 function FetchTest () {
 
     const [loggedIn, setLoggedIn] = useState(false)
-    const [taskList, setTaskList] = useState(["OLD"])
+    const [taskList, setTaskList] = useState(["OLD"]) //no longer using this as created a fetch within the ToDo component
     const [username, setUsername] = useState("")
     const [allOk, setAllOK] = useState(false)
     const [createShown, setCreateShown] = useState(false)
+    const URL = "https://playground.4geeks.com/apis/fake/todos/user/"
 
     useEffect(() => {
         if(loggedIn) {
-            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + username)
+            fetch(URL + username)
             .then(response => {
                 console.log(response)
                 if (!response.ok) {
@@ -42,7 +43,7 @@ function FetchTest () {
 
     function deleteUser () {
         if(confirm("Are you sure you want to delete the user '" + username + "' and all the related tasks?")) {
-            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + username, {
+            fetch(URL + username, {
                 method: "DELETE"
             })
             setLoggedIn(false)
@@ -51,7 +52,7 @@ function FetchTest () {
     }
 
     function createUser () {
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/" + username, {
+        fetch(URL + username, {
             method: "POST",
             body: JSON.stringify([]),
             headers: {
@@ -81,7 +82,7 @@ function FetchTest () {
                 <button className={`btn btn-${loggedIn ? "danger" : "success"}`} onClick={() => setLoggedIn(!loggedIn)}>{loggedIn ? "Return to login" : "Login"}</button>
                 {allOk ? <button className="btn btn-secondary deleteUser" onClick={deleteUser}>Delete user</button> : ""}
             </div>
-            {allOk ? <ToDo tasks={taskList} user={username} /> : ""}
+            {allOk ? <ToDo tasks={taskList} user={username} url={URL} /> : ""}
         </div>
     )
 }

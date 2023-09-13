@@ -37,13 +37,28 @@ input {
     padding: 5px;
 }
 
-.inputInside {
+input:focus {
     width: 100%;
-    background-color: #212529;
+    background-color: #282c30;
     color: white;
-    border: none;
+    border: 1px white solid;
     padding: 5px;
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #212529 inset;
+}
+
+input:-webkit-autofill{
+    -webkit-text-fill-color: white;
+}
+
+button > i {
+    pointer-events: none;
+} 
 
 .hoverParent:hover .hoverButton {
     visibility: visible;
@@ -55,4 +70,9 @@ input {
 
 .usernameNameplate {
     width: 200px;
+}
+
+.deleteUser {
+    font-size: 12px;
+    font-style: italic;
 }

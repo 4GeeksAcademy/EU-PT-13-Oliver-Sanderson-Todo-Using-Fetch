@@ -1,34 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function ToDo(props) {
 
-    const [toDoArr, setToDoArr] = useState (props.tasks)
+    const [toDoArr, setToDoArr] = useState(props.tasks)
     const [input, setInput] = useState("")
 
-    console.log(toDoArr)
+
+    useEffect(() => {
+        primaryFetch()
+    }, [])
+
+    function primaryFetch () {
+        console.log("primary fetch ran")
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => { 
+            setToDoArr(data.map((item) => item.label));
+        })
+    }
+
+    function returnUpdatedTodo () {
+        let array = toDoArr.map((item) => {return{"label": item, "done": false}})
+        array.unshift({ "label": input, "done": false },)
+        return array
+    }
+
+    function returnDeletedTodo (idToDelete) {
+        let array = toDoArr.filter((item,index) => index != idToDelete)
+        array = array.map((item) => {return{"label": item, "done": false}})
+        return array
+    }
 
     function addItem () {
-        let result = input.trim()
-        if (!result) {
-            alert("You need to enter valid text!")
+        if(input.trim() === "") {
+            alert("Input cannot be empty")
         } else {
-            setToDoArr(toDoArr.concat([result]))
-            setInput("")
+            fetch ("https://playground.4geeks.com/apis/fake/todos/user/" + props.user , {
+                method: "PUT",
+                body: JSON.stringify(
+                    returnUpdatedTodo()
+                ),
+    
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(resp => {
+                return resp.json()
+            }).then(data =>{
+                console.log("Add item returned data")
+                console.log(data) // this returns the message about it being updated... need to do another fetch
+                primaryFetch()
+            }).then(setInput(""))
+        }
+    }
+
+    function deleteItem (e) {
+        console.log(toDoArr.length)
+        if (toDoArr.length === 1) {
+            alert("Cannot delete the last task!")
+        } else {
+            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user ,{
+                method: "PUT",
+                body: JSON.stringify(
+                    returnDeletedTodo(e.target.parentElement.id)
+                ),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(resp => {
+                return resp.json()
+            }).then(data =>{
+                console.log("Delete item returned data")
+                console.log(data) // this returns the message about it being updated... need to do another fetch
+                primaryFetch()
+            })
         }
 
     }
 
-    const listItems = toDoArr.map((item, index) => 
-        <li className="d-flex justify-content-between hoverParent">
+    let listItems = toDoArr.map((item, index) => 
+        <li key={index} id={index} className="d-flex justify-content-between hoverParent">
         <p className="m-2" >{item}</p>
         <button className="btn btn-danger hoverButton" 
-        onClick={ () => setToDoArr(toDoArr.filter((x, i) => {return index != i}))}
-        ><i class="fa-solid fa-x"></i></button>
+        onClick={ deleteItem }
+        ><i className="fa-solid fa-x"></i></button>
         </li>
         )
+
     return (
         <div>
-            <h1 className="text-center">To Do List</h1>
+            <h1 className="text-center">{props.user.charAt(0).toUpperCase() + (props.user.slice(1))}'s To Do List</h1>
             <ul>
                 <li className="d-flex">
                      <input className="inputInside"
@@ -41,11 +104,8 @@ function ToDo(props) {
                             value={input} placeholder="What needs to be done?"/>
                             <button className="btn btn-primary" onClick={addItem}>Submit</button>
                 </li>
-                {listItems.length === 0 ? <li><p className="m-2" >No tasks, add a task.</p></li> : ""}
-                {listItems}
+                {listItems.length === 0 ? <li><p className="m-2" >Loading tasks...</p></li> : listItems}
             </ul>
-            <p>{listItems.length} item{listItems.length != 1 ? "s" : ""} left</p>
-            
         </div>
     )
 }

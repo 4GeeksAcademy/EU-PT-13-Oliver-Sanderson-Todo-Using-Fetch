@@ -5,8 +5,6 @@ function ToDo(props) {
     const [toDoArr, setToDoArr] = useState(props.tasks)
     const [input, setInput] = useState("")
 
-    console.log(toDoArr) // output shows "[]"
-    console.log(props.tasks) // output shows "['Eat some cake', 'Make the bed']" (as expected)
 
     useEffect(() => {
         primaryFetch()
@@ -36,46 +34,50 @@ function ToDo(props) {
     }
 
     function addItem () {
-
-        fetch ("https://playground.4geeks.com/apis/fake/todos/user/" + props.user , {
-            method: "PUT",
-            body: JSON.stringify(
-                returnUpdatedTodo()
-            ),
-
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(resp => {
-            return resp.json()
-        }).then(data =>{
-            console.log("THIS BIT")
-            console.log(data) // this returns the message about it being updated... need to do another fetch
-            primaryFetch()
-        })
-
+        if(input.trim() === "") {
+            alert("Input cannot be empty")
+        } else {
+            fetch ("https://playground.4geeks.com/apis/fake/todos/user/" + props.user , {
+                method: "PUT",
+                body: JSON.stringify(
+                    returnUpdatedTodo()
+                ),
+    
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(resp => {
+                return resp.json()
+            }).then(data =>{
+                console.log("Add item returned data")
+                console.log(data) // this returns the message about it being updated... need to do another fetch
+                primaryFetch()
+            }).then(setInput(""))
+        }
     }
 
     function deleteItem (e) {
-        console.log(e.target.parentElement.id);
-        console.log(props.tasks.filter((item, index) => 
-            index != e.target.parentElement.id
-            ))
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user ,{
-            method: "PUT",
-            body: JSON.stringify(
-                returnDeletedTodo(e.target.parentElement.id)
-            ),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(resp => {
-            return resp.json()
-        }).then(data =>{
-            console.log("THIS BIT")
-            console.log(data) // this returns the message about it being updated... need to do another fetch
-            primaryFetch()
-        })
+        console.log(toDoArr.length)
+        if (toDoArr.length === 1) {
+            alert("Cannot delete the last task!")
+        } else {
+            fetch("https://playground.4geeks.com/apis/fake/todos/user/" + props.user ,{
+                method: "PUT",
+                body: JSON.stringify(
+                    returnDeletedTodo(e.target.parentElement.id)
+                ),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(resp => {
+                return resp.json()
+            }).then(data =>{
+                console.log("Delete item returned data")
+                console.log(data) // this returns the message about it being updated... need to do another fetch
+                primaryFetch()
+            })
+        }
+
     }
 
     let listItems = toDoArr.map((item, index) => 
@@ -89,7 +91,7 @@ function ToDo(props) {
 
     return (
         <div>
-            <h1 className="text-center">To Do List</h1>
+            <h1 className="text-center">{props.user.charAt(0).toUpperCase() + (props.user.slice(1))}'s To Do List</h1>
             <ul>
                 <li className="d-flex">
                      <input className="inputInside"
@@ -102,9 +104,8 @@ function ToDo(props) {
                             value={input} placeholder="What needs to be done?"/>
                             <button className="btn btn-primary" onClick={addItem}>Submit</button>
                 </li>
-                {listItems.length === 0 ? <li><p className="m-2" >No tasks, add a task.</p></li> : listItems}
+                {listItems.length === 0 ? <li><p className="m-2" >Loading tasks...</p></li> : listItems}
             </ul>
-            {toDoArr}
         </div>
     )
 }
